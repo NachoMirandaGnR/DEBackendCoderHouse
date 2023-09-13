@@ -1,0 +1,20 @@
+<div>
+  <h1>Real-Time Products</h1>
+  <ul id="productList">
+    {{#each products}}
+      <li>{{this.title}} - {{this.price}}</li>
+    {{/each}}
+  </ul>
+
+  <form id="productForm">
+    <input type="text" id="title" placeholder="Title" />
+    <input type="text" id="price" placeholder="Price" />
+    <button type="submit">Add Product</button>
+  </form>
+
+</div>
+<script src="/js/index.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script
+  src="https//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.7/handlebars.min.js"
+></script>
