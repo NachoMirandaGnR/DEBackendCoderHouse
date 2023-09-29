@@ -2,6 +2,10 @@ import express from "express";
 import expressHandlebars from "express-handlebars";
 import http from "http";
 import { Server } from "socket.io";
+import mongoose from "mongoose"; // Importa Mongoose
+import Cart from "./dao/models/Cart.js"; // Importa tus modelos de Mongoose
+import Message from "./dao/models/Message.js";
+import Product from "./dao/models/Product.js";
 import productsRouter from "./routes/products.js";
 import cartsRouter from "./routes/carts.js";
 
@@ -9,6 +13,22 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const port = 8080;
+
+// Conecta a la base de datos MongoDB
+mongoose
+  .connect(
+    "mongodb+srv://ignaciomiranda1180:<password>@cluster0.llqpd8m.mongodb.net/?retryWrites=true&w=majority",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
+  .then(() => {
+    console.log("Conexión a MongoDB establecida correctamente");
+  })
+  .catch((error) => {
+    console.error("Error al conectar a MongoDB:", error);
+  });
 
 app.engine(
   "handlebars",
@@ -31,12 +51,8 @@ app.use("/api/carts", cartsRouter);
 app.get("/realtimeproducts", async (req, res) => {
   try {
     const { limit } = req.query;
-    const products = await productManager.getProducts();
-
-    if (limit) {
-      const limitedProducts = products.slice(0, parseInt(limit));
-      return res.render("realTimeProducts", { products: limitedProducts });
-    }
+    // Utiliza los modelos de Mongoose para interactuar con la base de datos
+    const products = await Product.find().limit(parseInt(limit) || undefined);
 
     res.render("realTimeProducts", { products });
   } catch (error) {
