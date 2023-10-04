@@ -1,0 +1,37 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lista de Productos</title>
+  </head>
+  <body>
+    <h1>Lista de Productos</h1>
+    <ul>
+      {{#each products}}
+        <li>
+          <h3>{{this.title}}</h3>
+          <p>Precio: ${{this.price}}</p>
+          <p>Descripción: {{this.description}}</p>
+          <p>Categoría: {{this.category}}</p>
+          <button onclick="addToCart('{{this._id}}')">Agregar al Carrito</button>
+        </li>
+      {{/each}}
+    </ul>
+
+    <!-- Paginación -->
+    <div class="pagination">
+      {{#if hasPrevPage}}
+        <a href="/products?page={{prevPage}}&limit={{limit}}">Página anterior</a>
+      {{/if}}
+      {{#if hasNextPage}}
+        <a href="/products?page={{nextPage}}&limit={{limit}}">Página siguiente</a>
+      {{/if}}
+    </div>
+
+    <a href="/carts/{{cartId}}">Ver Carrito</a>
+
+    <script>
+      function addToCart(productId) { }
+    </script>
+  </body>
+</html>

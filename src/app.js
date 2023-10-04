@@ -17,7 +17,7 @@ const port = 8080;
 // Conecta a la base de datos MongoDB
 mongoose
   .connect(
-    "mongodb+srv://ignaciomiranda1180:<password>@cluster0.llqpd8m.mongodb.net/?retryWrites=true&w=majority",
+    "mongodb+srv://ignaciomiranda1180:Nacho7931456$@cluster0.llqpd8m.mongodb.net/?retryWrites=true&w=majority",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -30,6 +30,7 @@ mongoose
     console.error("Error al conectar a MongoDB:", error);
   });
 
+// Configura el motor de plantillas Handlebars
 app.engine(
   "handlebars",
   expressHandlebars({
@@ -48,6 +49,7 @@ app.use("/api/products", productsRouter);
 // Rutas de carritos
 app.use("/api/carts", cartsRouter);
 
+// Ruta para visualizar productos en tiempo real
 app.get("/realtimeproducts", async (req, res) => {
   try {
     const { limit } = req.query;
@@ -62,6 +64,7 @@ app.get("/realtimeproducts", async (req, res) => {
   }
 });
 
+// Configura Socket.io para manejar conexiones en tiempo real
 io.on("connection", (socket) => {
   console.log("Usuario conectado");
 

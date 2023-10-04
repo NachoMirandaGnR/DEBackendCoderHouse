@@ -3,7 +3,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chat</title>
-
   </head>
   <body>
     <h1>Chat en tiempo real</h1>
@@ -22,22 +21,16 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      // Crear una instancia de Socket.io y conectar al servidor const socket =
-      io(); // Seleccionar elementos del DOM const userField =
-      document.getElementById('user'); const messageField =
-      document.getElementById('message'); const sendButton =
-      document.getElementById('send'); const messagesContainer =
-      document.getElementById('messages'); // Manejar el evento de clic en el
-      botón de enviar sendButton.addEventListener('click', () => { const user =
-      userField.value; const message = messageField.value; // Enviar el mensaje
-      al servidor a través de socket socket.emit('chatMessage', { user, message
-      }); // Limpiar el campo de mensaje messageField.value = ''; }); //
-      Escuchar eventos de mensajes desde el servidor socket.on('chatMessage',
-      (data) => { // Agregar el mensaje recibido al contenedor de mensajes const
-      messageElement = document.createElement('p'); messageElement.innerHTML =
+      const socket = io(); const userField = document.getElementById('user');
+      const messageField = document.getElementById('message'); const sendButton
+      = document.getElementById('send'); const messagesContainer =
+      document.getElementById('messages'); sendButton.addEventListener('click',
+      () => { const user = userField.value; const message = messageField.value;
+      socket.emit('chatMessage', { user, message }); messageField.value = '';
+      }); socket.on('chatMessage', (data) => { const messageElement =
+      document.createElement('p'); messageElement.innerHTML =
       `<strong>${data.user}:</strong> ${data.message}`;
       messagesContainer.appendChild(messageElement); });
     </script>
-
   </body>
 </html>

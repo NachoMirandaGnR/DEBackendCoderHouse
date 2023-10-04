@@ -6,13 +6,15 @@ const productManager = new ProductManager("products.json");
 
 router.get("/", async (req, res) => {
   try {
-    const { limit } = req.query;
-    const products = await productManager.getProducts();
+    const { limit = 10, page = 1, sort, query } = req.query;
+    const options = {
+      limit: parseInt(limit),
+      page: parseInt(page),
+      sort,
+      query,
+    };
 
-    if (limit) {
-      const limitedProducts = products.slice(0, parseInt(limit));
-      return res.json(limitedProducts);
-    }
+    const products = await productManager.getProducts(options);
 
     res.json(products);
   } catch (error) {
@@ -74,6 +76,50 @@ router.delete("/:pid", async (req, res) => {
     res.json({ message: "Producto eliminado correctamente" });
   } catch (error) {
     res.status(404).json({ error: "Producto no encontrado" });
+  }
+});
+
+// Ruta para buscar productos por categoría
+router.get("/category/:category", async (req, res) => {
+  try {
+    const { limit = 10, page = 1, sort } = req.query;
+    const { category } = req.params;
+    const options = {
+      limit: parseInt(limit),
+      page: parseInt(page),
+      sort,
+      query: { category },
+    };
+
+    const products = await productManager.getProducts(options);
+
+    res.json(products);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al cargar los productos por categoría" });
+  }
+});
+
+// Ruta para buscar productos por disponibilidad
+router.get("/availability/:available", async (req, res) => {
+  try {
+    const { limit = 10, page = 1, sort } = req.query;
+    const { available } = req.params;
+    const options = {
+      limit: parseInt(limit),
+      page: parseInt(page),
+      sort,
+      query: { available: available === "true" },
+    };
+
+    const products = await productManager.getProducts(options);
+
+    res.json(products);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al cargar los productos por disponibilidad" });
   }
 });
 

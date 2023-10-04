@@ -1,0 +1,28 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carrito de Compras</title>
+  </head>
+  <body>
+    <h1>Carrito de Compras</h1>
+    <ul>
+      {{#each cart.products}}
+        <li>
+          <h3>{{this.title}}</h3>
+          <p>Precio: ${{this.price}}</p>
+          <p>Cantidad: {{this.quantity}}</p>
+          <button onclick="removeFromCart('{{this._id}}')">Eliminar del Carrito</button>
+        </li>
+      {{/each}}
+    </ul>
+
+    <p>Total: ${{cart.totalPrice}}</p>
+
+    <a href="/products">Volver a la Lista de Productos</a>
+
+    <script>
+      function removeFromCart(productId) { }
+    </script>
+  </body>
+</html>
