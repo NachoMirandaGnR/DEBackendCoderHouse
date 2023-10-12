@@ -6,6 +6,14 @@
   </head>
   <body>
     <h1>Lista de Productos</h1>
+
+    {{#if user}}
+      <p>Bienvenido, {{user.name}} ({{user.role}})</p>
+      {{#if (eq user.role "admin")}}
+        <button onclick="logout()">Logout</button>
+      {{/if}}
+    {{/if}}
+
     <ul>
       {{#each products}}
         <li>
@@ -31,7 +39,7 @@
     <a href="/carts/{{cartId}}">Ver Carrito</a>
 
     <script>
-      function addToCart(productId) { }
+      function addToCart(productId) { } function logout() { }
     </script>
   </body>
 </html>
