@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-// Definir el esquema para los productos
 const productSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
@@ -12,7 +11,6 @@ const productSchema = new mongoose.Schema({
   status: { type: Boolean, default: true },
 });
 
-// Crear un modelo a partir del esquema
 const Product = mongoose.model("Product", productSchema);
 
 module.exports = Product;

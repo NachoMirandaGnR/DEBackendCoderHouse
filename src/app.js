@@ -2,8 +2,9 @@ import express from "express";
 import expressHandlebars from "express-handlebars";
 import http from "http";
 import { Server } from "socket.io";
-import mongoose from "mongoose"; // Importa Mongoose
-import Cart from "./dao/models/Cart.js"; // Importa tus modelos de Mongoose
+import mongoose from "mongoose";
+import { __dirname } from "./utils.js";
+import Cart from "./dao/models/Cart.js";
 import Message from "./dao/models/Message.js";
 import Product from "./dao/models/Product.js";
 import productsRouter from "./routes/products.js";
@@ -14,7 +15,6 @@ const server = http.createServer(app);
 const io = new Server(server);
 const port = 8080;
 
-// Conecta a la base de datos MongoDB
 mongoose
   .connect(
     "mongodb+srv://ignaciomiranda1180:Nacho7931456$@cluster0.llqpd8m.mongodb.net/?retryWrites=true&w=majority",
@@ -30,7 +30,6 @@ mongoose
     console.error("Error al conectar a MongoDB:", error);
   });
 
-// Configura el motor de plantillas Handlebars
 app.engine(
   "handlebars",
   expressHandlebars({
@@ -43,17 +42,13 @@ app.set("view engine", "handlebars");
 app.use(express.json());
 app.use(express.static("public"));
 
-// Rutas de productos
 app.use("/api/products", productsRouter);
 
-// Rutas de carritos
 app.use("/api/carts", cartsRouter);
 
-// Ruta para visualizar productos en tiempo real
 app.get("/realtimeproducts", async (req, res) => {
   try {
     const { limit } = req.query;
-    // Utiliza los modelos de Mongoose para interactuar con la base de datos
     const products = await Product.find().limit(parseInt(limit) || undefined);
 
     res.render("realTimeProducts", { products });
@@ -64,7 +59,6 @@ app.get("/realtimeproducts", async (req, res) => {
   }
 });
 
-// Configura Socket.io para manejar conexiones en tiempo real
 io.on("connection", (socket) => {
   console.log("Usuario conectado");
 
@@ -73,7 +67,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// Inicia el servidor
 server.listen(port, () => {
   console.log(`Servidor corriendo en el puerto ${port}`);
 });
