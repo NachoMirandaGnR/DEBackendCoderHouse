@@ -3,18 +3,23 @@ import expressHandlebars from "express-handlebars";
 import http from "http";
 import { Server } from "socket.io";
 import mongoose from "mongoose";
-import { __dirname } from "./utils.js";
-import Cart from "./dao/models/Cart.js";
-import Message from "./dao/models/Message.js";
-import Product from "./dao/models/Product.js";
+import passport from "passport";
+import session from "express-session";
+import bcrypt from "bcrypt";
+import LocalStrategy from "passport-local";
+import User from "./dao/models/User.js";
 import productsRouter from "./routes/products.js";
 import cartsRouter from "./routes/carts.js";
+import authRoutes from "./routes/authRoutes.js";
+import viewRouter from "./routes/web/views.router.js";
+import cors from "cors";
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const port = 8080;
 
+// Conexión a la base de datos MongoDB
 mongoose
   .connect(
     "mongodb+srv://ignaciomiranda1180:Nacho7931456$@cluster0.llqpd8m.mongodb.net/?retryWrites=true&w=majority",
@@ -30,6 +35,49 @@ mongoose
     console.error("Error al conectar a MongoDB:", error);
   });
 
+// Configuración de Passport
+app.use(
+  session({ secret: "tu_secreto", resave: true, saveUninitialized: true })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(
+  new LocalStrategy(async (email, password, done) => {
+    try {
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        return done(null, false, { message: "Usuario no encontrado" });
+      }
+
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (!passwordMatch) {
+        return done(null, false, { message: "Contraseña incorrecta" });
+      }
+
+      return done(null, user);
+    } catch (error) {
+      return done(error);
+    }
+  })
+);
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error);
+  }
+});
+
+// Configuración de Handlebars
 app.engine(
   "handlebars",
   expressHandlebars({
@@ -42,9 +90,23 @@ app.set("view engine", "handlebars");
 app.use(express.json());
 app.use(express.static("public"));
 
+// Rutas de productos
 app.use("/api/products", productsRouter);
 
+// Rutas de carritos
 app.use("/api/carts", cartsRouter);
+
+// Rutas de autenticación
+app.use("/auth", authRoutes);
+
+// Rutas de Views
+app.use("/", viewRouter);
+
+app.use(
+  cors({
+    origin: ["https://coderhouse.com"],
+  })
+);
 
 app.get("/realtimeproducts", async (req, res) => {
   try {
@@ -59,6 +121,7 @@ app.get("/realtimeproducts", async (req, res) => {
   }
 });
 
+// Configuración de Socket.io
 io.on("connection", (socket) => {
   console.log("Usuario conectado");
 
@@ -67,6 +130,7 @@ io.on("connection", (socket) => {
   });
 });
 
+// Inicia el servidor
 server.listen(port, () => {
   console.log(`Servidor corriendo en el puerto ${port}`);
 });
