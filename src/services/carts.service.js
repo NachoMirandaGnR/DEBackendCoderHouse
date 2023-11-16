@@ -1,5 +1,5 @@
-import Carts from "../CartManager";
-import Products from "../ProductManager.js";
+import Carts from "../controllers/cartManager";
+import Products from "../controllers/productManager";
 
 const cartsManager = new Carts();
 const productsManager = new Products();
