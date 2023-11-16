@@ -1,36 +1,20 @@
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chat</title>
-  </head>
-  <body>
-    <h1>Chat en tiempo real</h1>
-    <div id="chat-container">
-      <div id="messages">
-        {{#each messages}}
-          <p><strong>{{this.user}}:</strong> {{this.message}}</p>
-        {{/each}}
-      </div>
-      <div id="message-form">
-        <input type="text" id="user" placeholder="Tu nombre" />
-        <input type="text" id="message" placeholder="Escribe un mensaje" />
-        <button id="send">Enviar</button>
-      </div>
-    </div>
+<h1>Chat</h1>
+<div>
+  <input
+    type="text"
+    id="chatBox"
+    name="chatBox"
+    placeholder="Inserte mensaje"
+  />
+</div>
+<div>
+  <p id="messageLogs"> </p>
+</div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-      const socket = io(); const userField = document.getElementById('user');
-      const messageField = document.getElementById('message'); const sendButton
-      = document.getElementById('send'); const messagesContainer =
-      document.getElementById('messages'); sendButton.addEventListener('click',
-      () => { const user = userField.value; const message = messageField.value;
-      socket.emit('chatMessage', { user, message }); messageField.value = '';
-      }); socket.on('chatMessage', (data) => { const messageElement =
-      document.createElement('p'); messageElement.innerHTML =
-      `<strong>${data.user}:</strong> ${data.message}`;
-      messagesContainer.appendChild(messageElement); });
-    </script>
-  </body>
-</html>
+<script src="/socket.io/socket.io.js"></script>
+<link
+  href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"
+  rel="stylesheet"
+/>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/chats.js"></script>

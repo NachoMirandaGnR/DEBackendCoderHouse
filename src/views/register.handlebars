@@ -1,22 +1,33 @@
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Register</title>
-  </head>
-  <body>
-    <h1>Register</h1>
-    <form method="post" action="/register">
-      <label for="name">Name:</label>
-      <input type="text" name="name" id="name" required />
-      <br />
+<div class="formulario">
+  <h1>Nuevo Usuario</h1>
+  <form class="signup-form" id="signup-form">
+    <div class="username">
+      <input type="text" id="username" />
+      <label for="username">Usuario:</label>
+    </div>
+    <div class="username">
+      <input type="password" id="password" required />
+      <label for="password">Contraseña:</label>
+    </div>
+    <div class="username">
+      <input type="email" id="email" required />
       <label for="email">Email:</label>
-      <input type="text" name="email" id="email" required />
-      <br />
-      <label for="password">Password:</label>
-      <input type="password" name="password" id="password" required />
-      <br />
-      <input type="submit" value="Register" />
-    </form>
-  </body>
-</html>
+    </div>
+    <div class="username">
+      <input type="number" id="age" required />
+      <label for="age">Edad:</label>
+    </div>
+    <input type="submit" value="Crear Cuenta" id="signup" />
+
+    <div class="registrarse">
+      ¿Ya tiene cuenta?
+      <a href="http://localhost:8080/api/users/login">inicie Sesion</a>
+    </div>
+  </form>
+  <div>
+    <a href="/api/sessions/github"><button>Signup With GitHub</button></a>
+  </div>
+</div>
+
+<link rel="stylesheet" href="/css/login.css" />
+<script src="/js/singup.js"></script>
