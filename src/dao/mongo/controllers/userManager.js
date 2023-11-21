@@ -1,4 +1,4 @@
-import userModel from "../dao/mongo/models/user.models.js";
+import userModel from "../models/user.models.js";
 class productManager {
   constructor() {}
   async getUsers() {

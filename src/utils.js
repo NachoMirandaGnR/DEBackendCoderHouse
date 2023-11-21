@@ -1,6 +1,7 @@
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import bcrypt from "bcrypt";
+import Role from "./dao/mongo/models/role.models.js";
 import jwt from "jsonwebtoken";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -14,24 +15,18 @@ export const isValidPassword = (savedPassword, password) => {
   return bcrypt.compareSync(savedPassword, password);
 };
 
-const PRIVATE_KEY = "privateKey";
-export const generateToken = (user) => {
-  const token = jwt.sign({ user }, PRIVATE_KEY, { expiresIn: "1h" });
-  return token;
-};
-
-export const authToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ error: "token not found" });
+export const createRoles = async () => {
+  try {
+    const count = await Role.estimatedDocumentCount();
+    if (count > 0) return;
+    const values = await Promise.all([
+      new Role({ name: "user" }).save(),
+      new Role({ name: "premium" }).save(),
+      new Role({ name: "admin" }).save(),
+    ]);
+    console.log(values);
+  } catch (error) {
+    console.error(error);
   }
-  const token = authHeader.split(":")[1];
-  jwt.verify(token, PRIVATE_KEY, (err, user) => {
-    if (err) {
-      res.status(403).json({ error: "roken invalido" + err.message });
-    }
-    req.user = user;
-    next();
-  });
 };
 export default __dirname;

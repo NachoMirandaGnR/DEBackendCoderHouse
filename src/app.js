@@ -15,6 +15,9 @@ import viewRouter from "./routes/web/views.router.js";
 import cors from "cors";
 import initializePassport from "./src/config/passport.config.js";
 import MongoSingleton from "./MongoSingleton.js";
+import compression from "express-compression";
+import errorHandle from "./src/middlewares/errors.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const server = http.createServer(app);
@@ -36,6 +39,12 @@ mongoose
   .catch((error) => {
     console.error("Error al conectar a MongoDB:", error);
   });
+
+mongoose.set("strictQuery", false);
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(cookieParser());
 
 // Configuración de Passport
 app.use(
@@ -79,6 +88,9 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
+//usar compresion
+app.use(compression());
+
 // Configuración de Handlebars
 app.engine(
   "handlebars",
@@ -91,6 +103,9 @@ app.set("view engine", "handlebars");
 
 app.use(express.json());
 app.use(express.static("public"));
+
+//manejo de errores
+app.use(errorHandle);
 
 // Rutas de productos
 app.use("/api/products", productsRouter);
