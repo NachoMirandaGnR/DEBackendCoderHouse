@@ -18,6 +18,11 @@ import MongoSingleton from "./MongoSingleton.js";
 import compression from "express-compression";
 import errorHandle from "./src/middlewares/errors.js";
 import cookieParser from "cookie-parser";
+import sessionRouter from "./routes/session.routes.js";
+import mockingProducts from "./routes/mockingProducts.routes.js";
+import CustomError from "./services/errors/customErrors.js";
+import EErrors from "./services/errors/enumError.js";
+import { generateProductErrorInfo } from "./services/errors/errorInfo.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -125,6 +130,9 @@ app.use(
   })
 );
 
+app.use("/api/session/", sessionRouter);
+app.use("/mockingproducts", mockingProducts);
+
 app.get("/realtimeproducts", async (req, res) => {
   try {
     const { limit } = req.query;
@@ -147,11 +155,33 @@ io.on("connection", (socket) => {
   });
 });
 
-// Inicia el servidor
-server.listen(port, () => {
-  console.log(`Servidor corriendo en el puerto ${port}`);
-});
+socketServer.on("connection", (socket) => {
+  console.log("Nuevo cliente conectado");
+  socket.on("addProduct", async (newProduct) => {
+    console.log(newProduct);
+    if (newProduct.title.length < 4 || newProduct.description.length < 11) {
+      const error = CustomError.createError({
+        name: "Error al agregar un producto",
+        cause: "Parámetros incompletos o muy cortos",
+        message: generateProductErrorInfo(newProduct),
+        code: EErrors.INVALID_TYPES_ERROR,
+      });
+      console.log({ error });
+    } else {
+      await productManager.addProduct(newProduct);
+    }
+    // Agregar el nuevo producto a la lista de productos
+    let products = await productManager.getProductsRealtime();
+    socket.emit("updateList", products);
+  });
 
-initializePassport();
-app.use(passport.initialize());
-app.use(passport.session());
+  // Inicia el servidor
+  server.listen(port, () => {
+    console.log(`Servidor corriendo en el puerto ${port}`);
+  });
+
+  // Passport
+  initializePassport();
+  app.use(passport.initialize());
+  app.use(passport.session());
+});
