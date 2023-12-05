@@ -23,6 +23,7 @@ import mockingProducts from "./routes/mockingProducts.routes.js";
 import CustomError from "./services/errors/customErrors.js";
 import EErrors from "./services/errors/enumError.js";
 import { generateProductErrorInfo } from "./services/errors/errorInfo.js";
+import loggerTest from "./routes/loggerTest.routes.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -145,6 +146,8 @@ app.get("/realtimeproducts", async (req, res) => {
       .json({ error: "Error al cargar los productos en tiempo real" });
   }
 });
+
+app.use("/loggertest", loggerTest);
 
 // Configuración de Socket.io
 io.on("connection", (socket) => {
