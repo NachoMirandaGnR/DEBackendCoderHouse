@@ -1,0 +1,114 @@
+
+<div class="bodyy">
+  <form id="productForm" method="post" action="/realtime" class="form">
+  <h2>Agregar un nuevo producto</h2>
+  <div class="input-group">
+    <label for="productTitle" class="label">Título:</label>
+    <input
+      type="text"
+      id="productTitle"
+      name="title"
+      placeholder="Título del producto"
+      class="input"
+    />
+
+    <label for="productDescription" class="label">Descripción:</label>
+    <textarea
+      id="productDescription"
+      name="description"
+      placeholder="Descripción del producto"
+      class="input"
+    ></textarea>
+    <label for="productPrice" class="label">Precio:</label>
+    <input
+      type="number"
+      id="productPrice"
+      name="price"
+      step="0.01"
+      placeholder="Precio del producto"
+      class="input"
+    />
+    <label for="productThumbnail" class="label">Thumbnail:</label>
+    <input
+      type="text"
+      id="productThumbnail"
+      name="thumbnail"
+      placeholder="URL del thumbnail"
+      class="input"
+    />
+    <label for="productCode" class="label">Codigo:</label>
+    <input
+      type="text"
+      id="productCode"
+      name="code"
+      placeholder="Código del producto"
+      class="input"
+    />
+
+
+    <label for="productStock" class="label">Stock:</label>
+    <input
+      type="number"
+      id="productStock"
+      name="stock"
+      placeholder="Stock del producto"
+      class="input"
+    />
+    
+    <label for="productCategory" class="label">Cartegoria:</label>
+    <input
+      type="text"
+      id="productCategory"
+      name="category"
+      placeholder="Cartegoria del producto"
+      class="input"
+    />
+
+
+    <script>
+      function refrescarPagina() { location.reload(); }
+    </script>
+    <button type="submit" onclick="refrescarPagina()" class="btn-submit">Agregar</button>
+  </div>
+  </form>
+</div>
+
+  <div class="contenedor">
+
+    {{#each products}}
+
+      <div class="card">
+        <img src="{{thumbnail}}" class="card-img-top" alt="{{title}}" />
+        <div class="card-body">
+          <h5 class="card-title">{{title}}</h5>
+          <p class="card-text">{{description}}</p>
+          <h5>Precio: U$D {{price}}</h5>
+          <p>stock: {{stock}}</p>
+          <p>Código del producto: {{code}}</p>
+          <p>Categoria: {{category}}</p>
+          <button
+            class="btnEliminar"
+            data-id="{{id}}"
+            id="eliminarProducto"
+            onclick="deleteProduct({{code}})"
+            onclick="refrescarPagina()"
+          >Eliminar</button>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+<script src="/js/home.js"></script>
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+  integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+  crossorigin="anonymous"
+/>
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+  crossorigin="anonymous"
+></script>

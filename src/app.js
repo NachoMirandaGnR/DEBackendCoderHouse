@@ -24,6 +24,8 @@ import CustomError from "./services/errors/customErrors.js";
 import EErrors from "./services/errors/enumError.js";
 import { generateProductErrorInfo } from "./services/errors/errorInfo.js";
 import loggerTest from "./routes/loggerTest.routes.js";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUiExpress from "swagger-ui-express";
 
 const app = express();
 const server = http.createServer(app);
@@ -51,6 +53,20 @@ initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
+
+//configuracion de swagger
+const swaggerOptions = {
+  swaggerDefinition: {
+    iopenapi: "3.0.1",
+    info: {
+      title: "Documentacion de api",
+      description: "documentacion de apis del eccomerce de coderhouse",
+    },
+  },
+  apis: ["./src/docs/**/*.yaml"],
+};
+
+const specs = swaggerJsdoc(swaggerOptions);
 
 // Configuración de Passport
 app.use(
@@ -133,6 +149,7 @@ app.use(
 
 app.use("/api/session/", sessionRouter);
 app.use("/mockingproducts", mockingProducts);
+app.use("/api-docs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 app.get("/realtimeproducts", async (req, res) => {
   try {

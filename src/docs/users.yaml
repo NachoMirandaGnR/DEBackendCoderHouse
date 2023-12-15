@@ -1,0 +1,12 @@
+paths:
+  /api/cart/:
+    get:
+      sumary: Get all carts
+      tags:
+        - Carts
+      responses:
+        200:
+          description: carritos cargados exitosamente
+        500:
+          description: error al cargar carrito, generado por una query defectuosa
+  /api/cart/{id}:

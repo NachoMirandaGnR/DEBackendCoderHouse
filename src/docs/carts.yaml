@@ -1,0 +1,109 @@
+paths:
+  /api/cart/:
+    get:
+      sumary: Get all carts
+      tags:
+        - Carts
+      responses:
+        200:
+          description: carritos cargados exitosamente
+        500:
+          description: error al cargar carrito, generado por una query defectuosa
+  /api/cart/{id}:
+    get:
+      sumary: Get cart by id
+      tags:
+        - Carts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: id del carrito
+
+      responses:
+        200:
+          description: carrito cargado exitosamente
+        404:
+          description: carrito no encontrado
+        500:
+          description: error al cargar carrito, generado por una query defectuosa
+  /api/cart/newCart:
+    post:
+      sumary: Create a new cart
+      tags:
+        - Carts
+      requestBody:
+        content:
+
+      responses:
+        200:
+          description: carrito creado exitosamente
+        500:
+          description: error al crear carrito, generado por una query defectuosa
+  /api/cart/:cid/product/:pcode:
+    post:
+      sumary: Add product to cart
+      tags:
+        - Carts
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          description: id del carrito
+        - in: path
+          name: pcode
+          required: true
+          description: codigo del producto
+      responses:
+        200:
+          description: producto agregado exitosamente
+        404:
+          description: producto no encontrado
+        500:
+          description: error al agregar producto, generado por una query defectuosa
+
+  /api/cart/:cid:
+    delete:
+      sumary: Delete cart
+      tags:
+        - Carts
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          description: id del carrito
+      responses:
+        200:
+          description: carrito eliminado exitosamente
+        404:
+          description: carrito no encontrado
+        500:
+          description: error al eliminar carrito, generado por una query defectuosa
+# components:
+#   schemas:
+#     carts:
+#       type: object
+#       properties:
+#         id:
+#           type: objetID
+#           description: id autogenerado por mongoDB
+#         products:
+#           type: array
+#           items:
+#             type: object
+#             properties:
+#               code:
+#                 type: integer
+#                 description: codigo del producto
+#               title:
+#                 type: string
+#                 description: nombre del producto
+#               price:
+#                 type: integer
+#                 description: precio del producto
+#               quantity:
+#                 type: integer
+#                 description: cantidad del producto
+#               stock:
+#                 type: integer
+#                 description: stock del producto
