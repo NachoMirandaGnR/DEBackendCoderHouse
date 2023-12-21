@@ -1,105 +1,123 @@
 paths:
-  /api/products/:
+  /api/products:
     get:
-      sumary: Get all products
+      summary: Obtener todos los productos
       tags:
-        - Products
+        - Productos
       responses:
         200:
-          description: productos cargados exitosamente
+          description: Productos cargados exitosamente
         500:
-          description: error al cargar productos, generado por una query defectuosa
+          description: Error al cargar productos, generado por una consulta defectuosa
   /api/products/:code:
     get:
-      sumary: Get product by code
+      summary: Obtener producto por código
       tags:
-        - Products
+        - Productos
       parameters:
         - in: path
           name: code
           required: true
-          description: codigo del producto
-
+          description: Código del producto
       responses:
         200:
-          description: producto cargado exitosamente
+          description: Producto cargado exitosamente
         404:
-          description: producto no encontrado
+          description: Producto no encontrado
         500:
-          description: error al cargar producto, generado por una query defectuosa
+          description: Error al cargar producto, generado por una consulta defectuosa
   /api/products/addnewProduct:
     post:
-      sumary: Create a new product
+      summary: Crear un nuevo producto
       tags:
-        - Products
+        - Productos
       requestBody:
         content:
-
+          application/json: {}
       responses:
         200:
-          description: producto creado exitosamente
+          description: Producto creado exitosamente
         500:
-          description: error al crear producto, generado por una query defectuosa
-
+          description: Error al crear producto, generado por una consulta defectuosa
   /api/products/{code}:
     put:
-      sumary: Update product by code
+      summary: Actualizar producto por código
       tags:
-        - Products
+        - Productos
       parameters:
         - in: path
           name: code
           required: true
-          description: codigo del producto
+          description: Código del producto
       requestBody:
         content:
-
+          application/json: {}
       responses:
         200:
-          description: producto actualizado exitosamente
+          description: Producto actualizado exitosamente
         404:
-          description: producto no encontrado
+          description: Producto no encontrado
         500:
-          description: error al actualizar producto, generado por una query defectuosa
-  /api/products/:pcode:
+          description: Error al actualizar producto, generado por una consulta defectuosa
+  /api/products/{pcode}:
     delete:
-      sumary: Delete product by code
+      summary: Eliminar producto por código
       tags:
-        - Products
+        - Productos
       parameters:
         - in: path
           name: pcode
           required: true
-          description: codigo del producto
+          description: Código del producto
       responses:
         200:
-          description: producto eliminado exitosamente
+          description: Producto eliminado exitosamente
         404:
-          description: producto no encontrado
+          description: Producto no encontrado
         500:
-          description: error al eliminar producto, generado por una query defectuosa
+          description: Error al eliminar producto, generado por una consulta defectuosa
+
 components:
   schemas:
     Products:
+      type: object
       properties:
+        _id:
+          type: string
+          description: ID del producto
+        category:
+          type: string
+          description: Categoría del producto
         title:
-          type: String
-          description: titulo del producto
+          type: string
+          description: Nombre del producto
+        modelo:
+          type: string
+          description: Modelo del producto
         description:
-         type: String
-        description: descripcion del producto
-       code:
-         type: Number
-         description: codigo del producto
-       price:
-         type: Number
-         description: precio del producto
-       stock:
-         type: Number
-         description: stock del producto
-       category:
-        type: String
-         description: categoria del producto
+          type: string
+          description: Características del producto
         thumbnail:
-         type: String
-         description: imagen del producto
+          type: string
+          description: URL de la imagen del producto
+        code:
+          type: string
+          description: Código del producto
+        price:
+          type: number
+          description: Precio del producto
+        stock:
+          type: number
+          description: stock del producto
+      required:
+        - category
+        - title
+        - code
+        - price
+        - stock
+      example:
+        category: "Guitarras Electricas"
+        title: "Gibson Les Paul R9"
+        description: "Reedision de la mitica Gibson Les Paul de 1959 a cargo del luthier y su equipo Custom Shop, Murphy Lab."
+        code: "12"
+        price: 12000

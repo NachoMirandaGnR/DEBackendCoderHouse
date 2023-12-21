@@ -79,31 +79,39 @@ paths:
           description: carrito no encontrado
         500:
           description: error al eliminar carrito, generado por una query defectuosa
-# components:
-#   schemas:
-#     carts:
-#       type: object
-#       properties:
-#         id:
-#           type: objetID
-#           description: id autogenerado por mongoDB
-#         products:
-#           type: array
-#           items:
-#             type: object
-#             properties:
-#               code:
-#                 type: integer
-#                 description: codigo del producto
-#               title:
-#                 type: string
-#                 description: nombre del producto
-#               price:
-#                 type: integer
-#                 description: precio del producto
-#               quantity:
-#                 type: integer
-#                 description: cantidad del producto
-#               stock:
-#                 type: integer
-#                 description: stock del producto
+components:
+  schemas:
+    carts:
+      type: object
+      properties:
+        id:
+          type: objetID
+          description: id autogenerado por mongoDB
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: integer
+                description: codigo del producto
+              title:
+                type: string
+                description: nombre del producto
+              price:
+                type: integer
+                description: precio del producto
+              quantity:
+                type: integer
+                description: cantidad del producto
+              stock:
+                type: integer
+                description: stock del producto
+      example:
+        id: 1
+        products:
+          code: 1
+          title: "producto 1"
+          price: 1000
+          quantity: 1
+          stock: 10

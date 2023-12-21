@@ -1,12 +1,92 @@
 paths:
-  /api/cart/:
-    get:
-      sumary: Get all carts
+  /api/sessions/login:
+    post:
+      summary: Iniciar sesión
       tags:
-        - Carts
+        - Sesiones
+      parameters:
+        - in: path
+          name: username
+          required: true
+          description: username
+        - in: path
+          name: password
+          required: true
+          description: password
+      requestBody:
+        content:
+          application/json: {}
       responses:
         200:
-          description: carritos cargados exitosamente
+          description: Sesión iniciada exitosamente
+        404:
+          description: Usuario no encontrado
         500:
-          description: error al cargar carrito, generado por una query defectuosa
-  /api/cart/{id}:
+          description: Error al iniciar sesión, generado por una consulta defectuosa
+  /api/sessions/signup:
+    post:
+      summary: Registrarse
+      tags:
+        - Sesiones
+      parameters:
+        - in: path
+          name: username
+          required: true
+          description: username
+        - in: path
+          name: password
+          required: true
+          description: password
+        - in: path
+          name: email
+          required: true
+          description: email
+      requestBody:
+        content:
+          application/json: {}
+      responses:
+        200:
+          description: Usuario registrado exitosamente
+        500:
+          description: Error al registrar usuario, generado por una consulta defectuosa
+  /api/sessions/forgotPassword:
+    post:
+      summary: Recuperar contraseña
+      tags:
+        - Sesiones
+      requestBody:
+        content:
+          application/json: {}
+      responses:
+        200:
+          description: Contraseña recuperada exitosamente
+        404:
+          description: Usuario no encontrado
+        500:
+          description: Error al recuperar contraseña, generado por una consulta defectuosa
+
+components:
+  schemas:
+    users:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: Id autogenerado  por mongo db
+        username:
+          type: String
+          description: Nombre del usuario
+        email:
+          type: String
+          description: correo electronico del usuario
+        password:
+          type: String
+          description: Contrasena del usuario
+      required:
+        - username
+        - email
+        - password
+      example:
+        username: "Pedro"
+        password: "123456"
+        email: "pedroguitars@gmail.com"
