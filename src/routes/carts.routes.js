@@ -1,5 +1,5 @@
 import { Router } from "express";
-import cartManager from "../dao/mongo/controllers/cartManager.js";
+import cartManager from "../dao/mongo/controller/cartController.js";
 
 const cartRouter = Router();
 const carts = new cartManager();
@@ -95,7 +95,7 @@ cartRouter.post("/:id/order", async (req, res) => {
       res.json({ message: "orden generada", result });
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 });
 

@@ -26,6 +26,7 @@ import { generateProductErrorInfo } from "./services/errors/errorInfo.js";
 import loggerTest from "./routes/loggerTest.routes.js";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUiExpress from "swagger-ui-express";
+import "localstorage-polyfill";
 
 const app = express();
 const server = http.createServer(app);

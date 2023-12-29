@@ -1,5 +1,5 @@
 import { Router } from "express";
-import productManager from "../dao/mongo/controllers/productManager.js";
+import productManager from "../dao/mongo/controller/productController.js";
 import { verifyToken, isAdmin, isPremium } from "../middlewares/authJWT.js";
 
 const productRouter = Router();
@@ -18,7 +18,7 @@ productRouter.get("/", async (req, res) => {
 //addProduct
 productRouter.post(
   "/addnewProduct",
-  [verifyToken, isAdmin, isPremium],
+  [verifyToken, isAdmin],
   async (req, res) => {
     const product = req.body;
     const newProduct = await Manager.addProduct(product);
@@ -26,16 +26,12 @@ productRouter.post(
   }
 );
 // updateProductByCode
-productRouter.put(
-  "/:code",
-  [verifyToken, isAdmin, isPremium],
-  async (req, res) => {
-    const code = req.params.code;
-    const modified = req.body;
-    const product = await Manager.updateProductByCode(code, modified);
-    res.json(product);
-  }
-);
+productRouter.put("/:code", [verifyToken, isAdmin], async (req, res) => {
+  const code = req.params.code;
+  const moodifiedProduct = req.body;
+  const product = await Manager.updateProdcutByCode(code, moodifiedProduct);
+  res.json(product);
+});
 //deleteProduct
 productRouter.delete("/:code", [verifyToken, isAdmin], async (req, res) => {
   const code = req.params.code;
