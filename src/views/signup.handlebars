@@ -17,11 +17,15 @@
       <input type="number" id="age" required />
       <label for="age">Edad:</label>
     </div>
-    <input type="submit" value="Crear Cuenta" id="signup" />
+    <input
+      type="submit"
+      value="Crear Cuenta"
+      onclick="location.href='http://localhost:8080/api/views/login'"
+    />
 
     <div class="registrarse">
       ¿Ya tiene cuenta?
-      <a href="http://localhost:8080/api/users/login">inicie Sesion</a>
+      <a href="http://localhost:8080/api/views/login">inicie Sesion</a>
     </div>
   </form>
   <div>

@@ -1,12 +1,11 @@
 <h1>Cart</h1>
 <div>
-  <button class="Vaciar">Vaciar Carrito</button>
+  <button class="Vaciar" onclick="emptyCart()">Vaciar Carrito</button>
   {{#each cartProducts}}
-
     <div id="numero">
       <h5 class="product-name">{{title}}</h5>
-      <p class="product-quantity">quantity: {{quantity}}</p>
-      <p class="product-price">price: {{price}}</p>
+      <p class="product-quantity">Quantity: {{quantity}}</p>
+      <p class="product-price">Price: {{price}}</p>
       <p class="product-subtotal">Subtotal: </p>
       <button onclick="addToCart({{code}})" class="boton">+</button>
       <button onclick="deleteFromCart({{code}})" class="boton">-</button>
@@ -14,7 +13,23 @@
   {{/each}}
   <h1 id="cart-total">Total: </h1>
 
-  <button onclick="submitOrder()" id="checkout-button">Finalizar orden</button>
+  <button onclick="order()" id="checkout-button">Finalizar orden</button>
 </div>
 
-<script src="/js/home.js"></script>
+<script src="/js/cart.js"></script>
+<script src="../dao/mongo/controllers/cartManager.js"></script>
+<script>
+
+  order = () => { const cartId = getCookie('cartId'); if (!cartId) {
+  console.error('No se encontró el cartId en las cookies.'); return; }
+  fetch(`/api/cart/${cartId}/order`, { method: 'POST', headers: {
+  'Content-Type': 'application/json', }, }) .then((res) => res.json())
+  .then((data) => { console.log(data); window.location.href = '/'; })
+  .catch((error) => { console.error('Error al realizar la orden:', error); });
+  }; function getCookie(name) { const value = `; ${document.cookie}`; const
+  parts = value.split(`; ${name}=`); if (parts.length === 2) return
+  parts.pop().split(';').shift(); }
+
+</script>
+
+<link rel="stylesheet" href="/css/cart.css" />

@@ -1,250 +1,89 @@
 import { Router } from "express";
-import { createHash } from "../utils.js";
+import userModel from "../dao/mongo/models/user.models.js";
+import { createHash, isValidPassword } from "../utils.js";
 import passport from "passport";
-import { UserManager } from "../dao/mongo/controllers/userManager.js";
+import * as authControler from "../dao/mongo/controllers/userManager.js";
+import { verifyToken, isAdmin } from "../middlewares/authJWT.js";
+import jwt from "jsonwebtoken";
+import roleModel from "../dao/mongo/models/role.models.js";
+import * as dotenv from "dotenv";
 
-import CustomError from "../services/errors/customError.js";
-import EErrors from "../services/errors/enumError.js";
-
-const userManager = new UserManager();
-
-const router = Router();
-
-export function authUser(req, res, next) {
-  if (req.session?.username) {
-    return next();
-  }
-  const error = CustomError.createError({
-    name: "Usuario no autenticado",
-    cause: "Missing session",
-    message: "Error trying to validate user",
-    code: EErrors.AUTHENTICATION_ERROR,
-  });
-  return res.status(401).json({ error });
-}
-
-export function authAdmin(req, res, next) {
-  if (req.session?.username && req.session?.role == "admin") {
-    return next();
-  }
-  const error = CustomError.createError({
-    name: "Usuario no autenticado",
-    cause: "Missing session",
-    message: "Error trying to validate user",
-    code: EErrors.AUTHENTICATION_ERROR,
-  });
-  return res.status(401).json({ error });
-}
-
-// Login con Passport
-router.post("/login", passport.authenticate("login"), async (req, res) => {
-  if (!req.user) {
-    const error = CustomError.createError({
-      name: "Error en login",
-      cause: "Credenciales inválidas",
-      message: "Error trying to validate user",
-      code: EErrors.AUTHENTICATION_ERROR,
-    });
-    return res.json({ error });
-  } else {
-    req.session.username = req.user.email;
-    req.session.currentCartID = req.user.currentCartID;
-    req.session.role = req.user.role;
-
-    const result = await userManager.setCartID(
-      req.user.email,
-      req.user.currentCartID
-    );
-    res
-      .status(200)
-      .json({ status: "ok", message: "Logueado exitosamente", bd: result });
-  }
-});
-
-router.get("/failLogin", async (req, res) => {
-  res.render("failLogin", { title: "Falló" });
-});
-
-router.post(
-  "/signup",
-  passport.authenticate("register", { failureRedirect: "/failSignup" }),
-  async (req, res) => {
-    const { email, currentCartID } = req.body;
-    req.session.username = email;
-    req.session.currentCartID = currentCartID;
-    req.session.role = req.user.role;
-
-    const result = await userManager.setCartID(
-      req.user.email,
-      req.user.currentCartID
-    );
-
-    res
-      .status(200)
-      .json({ status: "ok", message: "user Registered", bd: result });
-  }
-);
-
-// ------------------------------------------- EDIT
-
-router.get("/failSignup", async (req, res) => {
-  console.log("Failed");
-  res.send({ error: "failed" });
-});
-
-router.get("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (!err) {
-      res.json({ respuesta: "ok" });
-    } else {
-      res.json({
-        status: "Error al cerrar sesion",
-        body: err,
-      });
-    }
-  });
-});
-
-router.post("/forgot", async (req, res) => {
-  const { username, password } = req.body;
-
-  const result = await UserModel.find({
-    email: username,
-  });
-
-  if (result.length === 0)
-    return res.status(401).json({
-      respuesta: "el usuario no existe",
-    });
-  else {
-    const respuesta = await UserModel.findByIdAndUpdate(result[0]._id, {
-      password: createHash(password),
-    });
-    res.status(200).json({
-      status: "ok",
-      respuesta: "se cambio la contraseña",
-      datos: respuesta,
-    });
-  }
-});
-
-router.get(
+dotenv.config();
+const sessionRouter = Router();
+//login
+sessionRouter.post("/login", authControler.login);
+//singUp
+sessionRouter.post("/signup", authControler.signup);
+//logout
+sessionRouter.get("/logout", authControler.logout);
+//forgotPassword
+sessionRouter.post("/forgotPassword", authControler.forgotPassword);
+// Iniciar sesion con GitHub API
+sessionRouter.get(
   "/github",
-  passport.authenticate("github", { scope: ["user:email"] }),
+  passport.authenticate("github", { scope: ["user:username"] }),
   async (req, res) => {}
 );
-
-router.get(
+//en caso de que falle el login con GitHub
+sessionRouter.get(
   "/githubcallback",
   passport.authenticate("github", { failureRedirect: "/login" }),
   async (req, res) => {
-    req.session.username = req.user.email;
-    res.redirect("/products");
+    req.session.user = req.user;
+    req.session.admin = true;
+    res.redirect("/");
   }
 );
+sessionRouter.get("/users", async (req, res) => {
+  const users = await userModel.find();
+  res.json(users);
+});
+sessionRouter.get("/users/:token", async (req, res) => {
+  try {
+    const token = req.params.token || req.cookies.token;
+    const decoded = jwt.verify(token, process.env.SECRET);
+    const id = decoded.id;
+    const user = await userModel.findById(id);
 
-export default router;
+    // Utilizar await para obtener el rol
+    const roleObject = await roleModel.findById(user.roles);
+    const role = roleObject.name;
 
-// Login sin hash del password
+    res.json({ user, role });
+  } catch (error) {
+    console.error("Error obteniendo información del usuario:", error);
+    res.status(500).json({ error: "Error obteniendo información del usuario" });
+  }
+});
 
-// router.post("/login", async (req, res) => {
-//   const { username, password } = req.body;
+// Manejar el formulario de actualización de perfil
+sessionRouter.post("/update", verifyToken, async (req, res) => {
+  try {
+    const token = req.params.token || req.cookies.token;
+    const decoded = jwt.verify(token, process.env.SECRET);
+    const id = decoded.id;
+    console.log(id);
 
-//   const result = await UserModel.find({
-//     email: username,
-//     password,
-//   });
+    const user = await userModel.findById(id);
+    // Procesar datos del formulario y actualizar información del usuario en MongoDB
+    const { username, email, password, age } = req.body;
+    console.log(req.body);
 
-//   if(result.length != 0){
-//     req.session.username = username;
-//     req.session.admin = true;
-//     return res.status(200).json({
-//       username: req.session.username,
-//       admin: req.session.admin,
-//       respuesta: result,
-//       status: 'ok',
-//     })
+    // Actualizar datos del usuario en MongoDB solo si se proporcionan en la solicitud
+    const updateFields = {};
+    if (username) updateFields.username = username;
+    if (email) updateFields.email = email;
+    if (password) updateFields.password = createHash(password);
+    if (age) updateFields.age = age;
 
-//   } else {
-//     return res.status(401).json({
-//       respuesta: "error",
-//     });
-//   }
-// });
+    await userModel.updateOne({ _id: user.id }, { $set: updateFields });
 
-// Login con hash del password
+    // Puedes enviar una respuesta indicando que la actualización fue exitosa
+    alert("Perfil actualizado correctamente");
+  } catch (error) {
+    console.error("Error al actualizar datos de usuario", error);
+    res.status(500).send("Error interno del servidor");
+  }
+});
 
-// router.post("/login", async (req, res) => {
-//   const { username, password } = req.body;
-
-//   const user = await UserModel.findOne({ email: username });
-
-//   if(user.length != 0){
-//     if (!isValidPassword(user.password, password)) {
-//       return res.status(403).send({status:'error', error:'incorrect password'});
-//     }
-//     delete user.password;
-//     req.session.username = user.email;
-//     req.session.admin = true;
-
-//     return res.status(200).json({
-//       username: req.session.username,
-//       admin: req.session.admin,
-//       respuesta: user,
-//       status: 'ok',
-//     })
-//   } else {
-//     return res.status(401).json({
-//       respuesta: "error",
-//     });
-//   }
-// });
-
-// Signup sin hashear la contraseña
-
-// router.post("/signup", async (req, res) => {
-//   const { first_name, last_name, age, email, password } = req.body;
-//   const result = await UserModel.create({
-//     first_name,
-//     last_name,
-//     age,
-//     email,
-//     password,
-//   });
-//   if (!result) {
-//     return res.status(401).json({
-//       respuesta: "error",
-//     });
-//   } else {
-//     req.session.username = email;
-//     req.session.admin = true;
-//     res.status(200).json({
-//       status: "ok",
-//     });
-//   }
-// });
-
-// signup con hash de la contraseña
-
-// router.post("/signup", async (req, res) => {
-
-//   const { first_name, last_name, age, email, password } = req.body;
-//   const result = await UserModel.create({
-//     first_name,
-//     last_name,
-//     age,
-//     email,
-//     password: createHash(password),
-//   });
-//   if (!result) {
-//     return res.status(401).json({
-//       respuesta: "error",
-//     });
-//   } else {
-//     req.session.username = email;
-//     req.session.admin = true;
-//     res.status(200).json({
-//       status: "ok",
-//     });
-//   }
-// });
+export default sessionRouter;

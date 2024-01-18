@@ -19,6 +19,7 @@ import compression from "express-compression";
 import errorHandle from "./src/middlewares/errors.js";
 import cookieParser from "cookie-parser";
 import sessionRouter from "./routes/session.routes.js";
+import userRouter from "./src/Router/user.routes.js";
 import mockingProducts from "./routes/mockingProducts.routes.js";
 import CustomError from "./services/errors/customErrors.js";
 import EErrors from "./services/errors/enumError.js";
@@ -70,9 +71,14 @@ const swaggerOptions = {
 const specs = swaggerJsdoc(swaggerOptions);
 
 // Configuración de Passport
-app.use(
-  session({ secret: "tu_secreto", resave: true, saveUninitialized: true })
-);
+function getUserNameFromToken(token) {
+  try {
+    const decoded = jwt.verify(token, "tu-secreto");
+    return decoded.username;
+  } catch (error) {
+    return null;
+  }
+}
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -147,7 +153,7 @@ app.use(
     origin: ["https://coderhouse.com"],
   })
 );
-
+app.use("/api/users", userRouter);
 app.use("/api/session/", sessionRouter);
 app.use("/mockingproducts", mockingProducts);
 app.use("/api-docs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));

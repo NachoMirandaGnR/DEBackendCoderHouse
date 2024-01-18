@@ -64,6 +64,16 @@ class productManager {
       console.error(error);
     }
   }
+  async removeStock(code, quantity) {
+    try {
+      const productById = await productModel.findById(code);
+      productById.stock -= quantity;
+      const productSave = await productById.save();
+      return productSave;
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   async getProductsByCode(code) {
     try {
